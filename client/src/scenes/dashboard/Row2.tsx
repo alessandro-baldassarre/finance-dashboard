@@ -5,9 +5,15 @@ interface Props { }
 export default function Row2({ }: Props) {
     return (
         <>
-            <DashboardBox gridArea="d" />
-            <DashboardBox gridArea="e" />
-            <DashboardBox gridArea="f" />
+            <DashboardBox gridArea="d">
+
+            </DashboardBox>
+            <DashboardBox gridArea="e">
+
+            </DashboardBox>
+            <DashboardBox gridArea="f">
+
+            </DashboardBox>
         </>
     )
 }
