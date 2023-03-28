@@ -1,30 +1,63 @@
+import BoxHeader from '@/components/BoxHeader'
 import { DashboardBox } from '@/components/DashboardBox'
 import { useGetKpisQuery } from '@/state/api'
 import { useTheme } from '@mui/material'
 import { useMemo } from 'react'
-import { XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts'
+import { XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart, BarChart, CartesianGrid, Bar, LineChart, Legend, Line } from 'recharts'
 
 interface Props { }
 
 export default function Row1({ }: Props) {
     const { palette } = useTheme()
     const { data } = useGetKpisQuery()
-    const revenueExpenses = useMemo(() => {
+
+    const revenue = useMemo(() => {
         return (
-            data && data[0].monthlyData.map(({ month, revenue, expenses }) => {
+            data &&
+            data[0].monthlyData.map(({ month, revenue }) => {
                 return {
                     name: month.substring(0, 3),
-                    revenue,
-                    expenses
-                }
+                    revenue: revenue,
+                };
             })
-        )
-    }, [data])
+        );
+    }, [data]);
+
+    const revenueExpenses = useMemo(() => {
+        return (
+            data &&
+            data[0].monthlyData.map(({ month, revenue, expenses }) => {
+                return {
+                    name: month.substring(0, 3),
+                    revenue: revenue,
+                    expenses: expenses,
+                };
+            })
+        );
+    }, [data]);
+
+    const revenueProfit = useMemo(() => {
+        return (
+            data &&
+            data[0].monthlyData.map(({ month, revenue, expenses }) => {
+                return {
+                    name: month.substring(0, 3),
+                    revenue: revenue,
+                    profit: (revenue - expenses).toFixed(2),
+                };
+            })
+        );
+    }, [data]);
 
     return (
         <>
             <DashboardBox gridArea="a">
-                <ResponsiveContainer width="100%" height="100%">
+                <BoxHeader
+                    title="Revenue and Expenses"
+                    subtitle="top line represents revenue, bottom line represents expenses"
+                    sideText="+4%"
+                />
+                <ResponsiveContainer width="100%" height="80%">
                     <AreaChart
                         width={500}
                         height={400}
@@ -33,8 +66,9 @@ export default function Row1({ }: Props) {
                             top: 15,
                             right: 25,
                             left: -10,
-                            bottom: 60,
+                            bottom: 10,
                         }}
+                        stackOffset="none"
                     >
                         <defs>
                             <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
@@ -93,8 +127,114 @@ export default function Row1({ }: Props) {
                     </AreaChart>
                 </ResponsiveContainer>
             </DashboardBox>
-            <DashboardBox gridArea="b" />
-            <DashboardBox gridArea="c" />
+            <DashboardBox gridArea="b">
+                <BoxHeader
+                    title="Profit and Revenue"
+                    subtitle="top line represents revenue, bottom line represents expenses"
+                    sideText="+4%"
+                />
+                <ResponsiveContainer width="100%" height="82%">
+                    <LineChart
+                        width={500}
+                        height={400}
+                        data={revenueProfit}
+                        margin={{
+                            top: 20,
+                            right: 0,
+                            left: -10,
+                            bottom: 0,
+                        }}
+                    >
+                        <CartesianGrid vertical={false} stroke={palette.grey[800]} />
+                        <XAxis
+                            dataKey="name"
+                            tickLine={false}
+                            style={{ fontSize: "10px" }}
+                        />
+                        <YAxis
+                            yAxisId="left"
+                            tickLine={false}
+                            axisLine={false}
+                            style={{ fontSize: "10px" }}
+                        />
+                        <YAxis
+                            yAxisId="right"
+                            orientation="right"
+                            tickLine={false}
+                            axisLine={false}
+                            style={{ fontSize: "10px" }}
+                        />
+                        <Tooltip />
+                        <Legend
+                            height={20}
+                            wrapperStyle={{
+                                margin: "0 0 10px 0",
+                            }}
+                        />
+                        <Line
+                            yAxisId="left"
+                            type="monotone"
+                            dataKey="profit"
+                            stroke={palette.tertiary[500]}
+                        />
+                        <Line
+                            yAxisId="right"
+                            type="monotone"
+                            dataKey="revenue"
+                            stroke={palette.primary.main}
+                        />
+                    </LineChart>
+                </ResponsiveContainer>
+            </DashboardBox>
+            <DashboardBox gridArea="c">
+                <BoxHeader
+                    title="Revenue Month by Month"
+                    subtitle="graph representing the revenue month by month"
+                    sideText="+4%"
+                />
+                <ResponsiveContainer width="100%" height="75%">
+                    <BarChart
+                        width={500}
+                        height={300}
+                        data={revenue}
+                        margin={{
+                            top: 17,
+                            right: 15,
+                            left: -5,
+                            bottom: 10,
+                        }}
+                    >
+                        <defs>
+                            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                <stop
+                                    offset="5%"
+                                    stopColor={palette.primary[300]}
+                                    stopOpacity={0.8}
+                                />
+                                <stop
+                                    offset="95%"
+                                    stopColor={palette.primary[300]}
+                                    stopOpacity={0}
+                                />
+                            </linearGradient>
+                        </defs>
+                        <CartesianGrid vertical={false} stroke={palette.grey[800]} />
+                        <XAxis
+                            dataKey="name"
+                            axisLine={false}
+                            tickLine={false}
+                            style={{ fontSize: "10px" }}
+                        />
+                        <YAxis
+                            axisLine={false}
+                            tickLine={false}
+                            style={{ fontSize: "10px" }}
+                        />
+                        <Tooltip />
+                        <Bar dataKey="revenue" fill="url(#colorRevenue)" />
+                    </BarChart>
+                </ResponsiveContainer>
+            </DashboardBox>
         </>
     )
 }
