@@ -39,7 +39,7 @@ export interface GetProductsResponse {
     _id: string,
     __v: number,
     price: number,
-    expenses: number,
+    expense: number,
     transactions: string[],
     createdAt: string,
     updatedAt: string,
